@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Likhavat — Hindi Script Writer</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1612;
+    --ink2: #2e2820;
+    --paper: #f5f0e8;
+    --paper2: #ede7d8;
+    --paper3: #e4dcc8;
+    --accent: #c0392b;
+    --accent2: #e74c3c;
+    --gold: #b8860b;
+    --gold2: #d4a017;
+    --muted: #7a6f5e;
+    --muted2: #9e9180;
+    --border: rgba(26,22,18,0.12);
+    --border2: rgba(26,22,18,0.22);
+    --script-width: 680px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    background: rgba(10,8,6,0.6);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'EB Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+  }
+  .logo span { color: var(--gold2); }
+  .logo-hindi {
+    font-size: 12px;
+    color: var(--muted2);
+    letter-spacing: 0.08em;
+    margin-top: 1px;
+  }
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lang-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .lang-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted2);
+    transition: all .15s;
+  }
+  .lang-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* ── Main layout ── */
+  .main {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 61px);
+  }
+
+  /* ── Left panel: Setup ── */
+  .setup-panel {
+    width: 300px;
+    flex-shrink: 0;
+    border-right: 0.5px solid rgba(255,255,255,0.07);
+    background: rgba(0,0,0,0.3);
+    padding: 24px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .panel-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted2);
+    margin-bottom: 10px;
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted2);
+    letter-spacing: 0.04em;
+    margin-bottom: 5px;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: var(--paper);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color .15s;
+    resize: none;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    border-color: rgba(192,57,43,0.5);
+  }
+  textarea { line-height: 1.6; min-height: 80px; }
+  select option { background: #1a1612; color: var(--paper); }
+
+  .mix-slider-wrap {
+    margin-top: 4px;
+  }
+  .mix-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted2);
+    margin-bottom: 5px;
+  }
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .mix-value {
+    text-align: center;
+    font-size: 11px;
+    color: var(--gold2);
+    font-weight: 600;
+    margin-top: 5px;
+  }
+
+  .generate-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    margin-top: 4px;
+  }
+  .generate-btn:hover { background: var(--accent2); }
+  .generate-btn:active { transform: scale(0.98); }
+  .generate-btn:disabled { background: rgba(192,57,43,0.3); cursor: not-allowed; }
+
+  .beats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .beat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted2);
+    padding: 5px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.03);
+    transition: all .2s;
+  }
+  .beat-item.active { color: var(--gold2); background: rgba(212,160,23,0.08); }
+  .beat-item.done { color: rgba(255,255,255,0.35); }
+  .beat-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    flex-shrink: 0;
+    transition: background .2s;
+  }
+  .beat-item.active .beat-dot { background: var(--gold2); }
+  .beat-item.done .beat-dot { background: rgba(255,255,255,0.2); }
+  .beat-item.interval { border-left: 2px solid var(--accent); padding-left: 6px; }
+  .beat-item.interval.active { border-left-color: var(--gold2); }
+
+  /* ── Script output area ── */
+  .script-panel {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px 80px;
+  }
+
+  .script-page {
+    width: 100%;
+    max-width: var(--script-width);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--paper3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 22px;
+  }
+  .empty-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 20px;
+    color: var(--ink2);
+    margin-bottom: 6px;
+  }
+  .empty-sub { font-size: 13px; color: var(--muted); max-width: 320px; line-height: 1.6; }
+
+  /* Script elements */
+  .script-title-block {
+    text-align: center;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--border2);
+  }
+  .script-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .script-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .script-meta {
+    font-size: 11px;
+    color: var(--muted2);
+    margin-top: 8px;
+  }
+
+  .scene-heading {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 32px 0 10px;
+    padding: 6px 10px;
+    background: var(--paper3);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .action-line {
+    color: var(--ink2);
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 10px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .dialogue-block {
+    margin: 14px 0 14px 80px;
+    max-width: 380px;
+  }
+  .character-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 2px;
+    text-align: center;
+  }
+  .parenthetical {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .dialogue-text {
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .interval-marker {
+    text-align: center;
+    margin: 40px 0;
+    padding: 16px;
+    border-top: 1.5px solid var(--accent);
+    border-bottom: 1.5px solid var(--accent);
+    background: rgba(192,57,43,0.04);
+  }
+  .interval-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .interval-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .song-note {
+    margin: 20px 0;
+    padding: 12px 16px;
+    background: rgba(184,134,11,0.06);
+    border: 0.5px solid rgba(184,134,11,0.3);
+    border-radius: 6px;
+  }
+  .song-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .song-desc {
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    color: var(--ink2);
+    font-style: italic;
+  }
+
+  .beat-divider {
+    text-align: center;
+    margin: 28px 0 8px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted2);
+  }
+
+  /* Streaming cursor */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--accent);
+    vertical-align: middle;
+    animation: blink .7s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* Loading state */
+  .loading-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--gold2));
+    transition: width .3s;
+    z-index: 999;
+  }
+
+  /* Right panel: Scene list */
+  .scenes-panel {
+    width: 200px;
+    flex-shrink: 0;
+    border-left: 0.5px solid rgba(255,255,255,0.07);
+    background: rgba(0,0,0,0.2);
+    padding: 20px 14px;
+    overflow-y: auto;
+    display: none;
+  }
+  .scenes-panel.visible { display: block; }
+  .scene-nav-item {
+    font-size: 11px;
+    color: var(--muted2);
+    padding: 5px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .15s;
+    margin-bottom: 2px;
+    line-height: 1.4;
+  }
+  .scene-nav-item:hover { background: rgba(255,255,255,0.05); color: var(--paper); }
+  .scene-nav-item.is-interval { color: var(--accent); font-weight: 600; }
+
+  /* Export bar */
+  .export-bar {
+    position: fixed;
+    bottom: 0; left: 300px; right: 0;
+    padding: 12px 32px;
+    background: rgba(10,8,6,0.9);
+    border-top: 0.5px solid rgba(255,255,255,0.08);
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(8px);
+    z-index: 50;
+  }
+  .export-bar.visible { display: flex; }
+  .export-info { font-size: 13px; color: var(--muted2); }
+  .export-info strong { color: var(--paper); }
+  .export-btns { display: flex; gap: 8px; }
+  .export-btn {
+    padding: 7px 16px;
+    font-size: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: var(--paper);
+    transition: all .15s;
+  }
+  .export-btn:hover { background: rgba(255,255,255,0.08); }
+  .export-btn.primary { background: var(--accent); border-color: var(--accent); }
+  .export-btn.primary:hover { background: var(--accent2); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  .script-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+
+  /* Animations */
+  .fade-in { animation: fadeIn .4s ease forwards; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.15);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
+</style>
+</head>
+<body>
+
+<div class="loading-bar" id="loadingBar" style="width:0%"></div>
+
+<div class="header">
+  <div>
+    <div class="logo">लिखावट <span>·</span> Likhavat</div>
+    <div class="logo-hindi">Hindi Script Writer — Beta</div>
+  </div>
+  <div class="header-controls">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('hinglish')">Hinglish</button>
+      <button class="lang-btn" onclick="setLang('hindi')">शुद्ध हिंदी</button>
+      <button class="lang-btn" onclick="setLang('english')">English</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Setup Panel -->
+  <div class="setup-panel">
+
+    <div>
+      <div class="panel-section-title">Film Setup</div>
+      <div style="margin-bottom:12px">
+        <label>Film title</label>
+        <input type="text" id="filmTitle" placeholder="e.g. Ek Baar Phir" />
+      </div>
+      <div style="margin-bottom:12px">
+        <label>Logline / idea</label>
+        <textarea id="logline" placeholder="e.g. Ek retired cricketer apni beti ke saath ek last match khelne wapas aata hai..." rows="4"></textarea>
+      </div>
+      <div style="margin-bottom:12px">
+        <label>Genre</label>
+        <select id="genre">
+          <option value="drama">Family Drama</option>
+          <option value="romance">Romance</option>
+          <option value="thriller">Thriller</option>
+          <option value="comedy">Comedy</option>
+          <option value="action">Action Drama</option>
+          <option value="social">Social Drama</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px">
+        <label>Scene to generate</label>
+        <select id="sceneType">
+          <option value="opening">Opening scene</option>
+          <option value="inciting">Inciting incident</option>
+          <option value="interval">Interval beat</option>
+          <option value="climax">Climax scene</option>
+          <option value="resolution">Resolution</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-section-title">Language Mix</div>
+      <div class="mix-slider-wrap">
+        <div class="mix-labels">
+          <span>शुद्ध हिंदी</span>
+          <span>Hinglish</span>
+          <span>English</span>
+        </div>
+        <input type="range" id="mixSlider" min="0" max="100" value="50" oninput="updateMix(this.value)">
+        <div class="mix-value" id="mixLabel">Natural Hinglish</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-section-title">Story beats</div>
+      <div class="beats-list" id="beatsList">
+        <div class="beat-item" data-beat="opening"><span class="beat-dot"></span>Opening hook</div>
+        <div class="beat-item" data-beat="setup"><span class="beat-dot"></span>World setup</div>
+        <div class="beat-item" data-beat="inciting"><span class="beat-dot"></span>Inciting incident</div>
+        <div class="beat-item" data-beat="complication"><span class="beat-dot"></span>Complication</div>
+        <div class="beat-item interval" data-beat="interval"><span class="beat-dot"></span>— INTERVAL —</div>
+        <div class="beat-item" data-beat="twist"><span class="beat-dot"></span>Post-interval turn</div>
+        <div class="beat-item" data-beat="climax"><span class="beat-dot"></span>Climax</div>
+        <div class="beat-item" data-beat="resolution"><span class="beat-dot"></span>Resolution</div>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="genBtn" onclick="generateScript()">
+      Script Generate Karo
+    </button>
+
+  </div>
+
+  <!-- Script Panel -->
+  <div class="script-panel" id="scriptPanel">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">✍</div>
+      <div class="empty-title">Khaali Panna</div>
+      <div class="empty-sub">Apni film ki kahani, genre, aur scene choose karo — phir generate karo.</div>
+    </div>
+    <div class="script-page" id="scriptPage" style="display:none"></div>
+  </div>
+
+  <!-- Scenes nav -->
+  <div class="scenes-panel" id="scenesPanel">
+    <div class="panel-section-title" style="color:rgba(255,255,255,0.3)">Scenes</div>
+    <div id="sceneNavList"></div>
+  </div>
+
+</div>
+
+<!-- Export bar -->
+<div class="export-bar" id="exportBar">
+  <div class="export-info">
+    <strong id="exportTitle">—</strong>
+    <span id="exportMeta"> · ready to export</span>
+  </div>
+  <div class="export-btns">
+    <button class="export-btn" onclick="rewriteDialogue()">Dialogue Rewrite ↺</button>
+    <button class="export-btn" onclick="generateMore()">Agla Scene →</button>
+    <button class="export-btn primary" onclick="exportPDF()">Export PDF</button>
+  </div>
+</div>
+
+<script>
+let currentLang = 'hinglish';
+let generatedContent = '';
+let sceneCount = 0;
+let currentTitle = '';
+
+function setLang(l) {
+  currentLang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function updateMix(v) {
+  const labels = {
+    0: 'शुद्ध हिंदी', 20: 'ज़्यादातर हिंदी', 40: 'थोड़ी English',
+    50: 'Natural Hinglish', 60: 'Mixed Hinglish', 80: 'More English', 100: 'Mostly English'
+  };
+  const nearest = Object.keys(labels).reduce((a,b) => Math.abs(b-v) < Math.abs(a-v) ? b : a);
+  document.getElementById('mixLabel').textContent = labels[nearest];
+}
+
+function setLoadingBar(pct) {
+  document.getElementById('loadingBar').style.width = pct + '%';
+}
+
+function activateBeat(beatName) {
+  document.querySelectorAll('.beat-item').forEach(b => {
+    b.classList.remove('active');
+    if (b.dataset.beat === beatName) b.classList.add('active');
+  });
+}
+
+function markBeatDone(beatName) {
+  document.querySelectorAll('.beat-item').forEach(b => {
+    if (b.dataset.beat === beatName) {
+      b.classList.remove('active');
+      b.classList.add('done');
+    }
+  });
+}
+
+function getMixDescription() {
+  const v = parseInt(document.getElementById('mixSlider').value);
+  if (v <= 15) return 'pure Hindi (Devanagari roman script), no English words at all';
+  if (v <= 35) return 'mostly Hindi with occasional English words for objects/concepts';
+  if (v <= 65) return 'natural Hinglish — as educated urban Indians actually speak, mixing Hindi grammar with English words fluidly';
+  if (v <= 85) return 'English-dominant with Hindi words for emotion, family terms, and cultural expressions';
+  return 'mostly English with Hindi only for emotional or cultural emphasis';
+}
+
+async function generateScript(continueMode = false) {
+  if (!continueMode) {
+    sceneCount = 0;
+    generatedContent = '';
+  }
+  const title = document.getElementById('filmTitle').value.trim() || 'Ek Baar Phir';
+  const logline = document.getElementById('logline').value.trim() || 'A retired teacher returns to his village to confront an old regret before it is too late.';
+  const genre = document.getElementById('genre').value;
+  const sceneType = document.getElementById('sceneType').value;
+  const mixDesc = getMixDescription();
+  currentTitle = title;
+
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('genBtn').innerHTML = '<span class="spinner"></span>Likh raha hoon...';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('scriptPage').style.display = 'block';
+
+  setLoadingBar(10);
+  activateBeat(sceneType === 'opening' ? 'opening' : sceneType === 'inciting' ? 'inciting' : sceneType === 'interval' ? 'interval' : sceneType === 'climax' ? 'climax' : 'resolution');
+
+  const sceneTypeLabels = {
+    opening: 'the opening scene — establish protagonist, world, and tone within the first 3 pages',
+    inciting: 'the inciting incident — the moment that disrupts the protagonist\'s world and sets the story in motion',
+    interval: 'the INTERVAL BEAT — the dramatic crisis or revelation that sends the audience into intermission wanting to know what happens next. This is a structural pillar of Indian cinema.',
+    climax: 'the climax — the highest emotional and dramatic point of the film',
+    resolution: 'the resolution — the emotional payoff and final image of the film'
+  };
+
+  const systemPrompt = `You are a master Hindi film screenwriter trained in both commercial Bollywood and parallel Indian cinema. You write scripts with cultural authenticity, emotional depth, and precise understanding of Indian narrative structure.
+
+LANGUAGE: Write all dialogue in ${mixDesc}. Action lines in English. Character names in both scripts where appropriate.
+
+FORMAT RULES — follow exactly:
+- Scene headings: INT./EXT. LOCATION — DAY/NIGHT (in caps, with pipe prefix |SCENE|)
+- Action lines: plain prose, present tense
+- Character names before dialogue: centered, ALL CAPS  
+- Parentheticals: (in parentheses, italicized instruction)
+- Dialogue: indented, in the character's natural voice
+- Interval marker: |INTERVAL| on its own line when writing the interval beat
+- Song notes: |SONG| Description of mood/purpose — NO ACTUAL LYRICS
+- Mark beat type at top: |BEAT:beatname|
+
+CULTURAL RULES:
+- Indian characters express emotion directly and physically — gestures, touch, silence matter
+- Family dynamics are central — respect hierarchies in how characters address each other
+- Dialogue subtext works through implication, not Western understatement
+- The interval beat must feel like a gut-punch — a revelation, betrayal, or impossible choice
+- Use Indian idioms naturally — never explain them
+
+Write ${sceneTypeLabels[sceneType]} for a ${genre} film titled "${title}". 
+
+Logline: ${logline}
+
+Write 2-3 full scenes (approximately 3-4 script pages). Be specific with locations, character names, and authentic Indian settings. Make the dialogue feel real — like something an Indian actor would be excited to perform.`;
+
+  const userPrompt = `Write the ${sceneTypeLabels[sceneType]} for "${title}". Give me full screenplay format with at least 2 scenes, authentic Hinglish dialogue, and strong emotional beats.`;
+
+  // Render title block on first generation; always create a fresh streamTarget.
+  const page = document.getElementById('scriptPage');
+  if (sceneCount === 0) {
+    page.innerHTML = `
+      <div class="script-title-block fade-in">
+        <div class="script-title">${title}</div>
+        <div class="script-subtitle">Written with Likhavat · ${genre.charAt(0).toUpperCase()+genre.slice(1)}</div>
+        <div class="script-meta">Language: ${document.getElementById('mixLabel').textContent} · ${new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+      <div id="streamTarget"></div>
+    `;
+  } else {
+    // Retire the old streamTarget id so getElementById always finds the current one.
+    const old = document.getElementById('streamTarget');
+    if (old) old.removeAttribute('id');
+    page.insertAdjacentHTML('beforeend', '<div class="beat-divider">· · ·</div><div id="streamTarget"></div>');
+  }
+
+  setLoadingBar(25);
+
+  // Show a live raw-text preview while tokens arrive.
+  const streamTarget = document.getElementById('streamTarget');
+  const streamPre = document.createElement('pre');
+  streamPre.style.cssText = 'font-family:"DM Mono",monospace;font-size:12px;color:var(--ink2);white-space:pre-wrap;word-break:break-word;margin:0;padding:4px 0;';
+  const cursorEl = document.createElement('span');
+  cursorEl.className = 'cursor';
+  streamTarget.appendChild(streamPre);
+  streamTarget.appendChild(cursorEl);
+
+  try {
+    const response = await fetch('http://localhost:3001/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1800,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server error ${response.status}`);
+    }
+
+    setLoadingBar(40);
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let sseBuffer = '';
+    let rawText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      sseBuffer += decoder.decode(value, { stream: true });
+      const parts = sseBuffer.split('\n\n');
+      sseBuffer = parts.pop(); // last potentially incomplete event
+
+      for (const part of parts) {
+        const line = part.trim();
+        if (!line.startsWith('data: ')) continue;
+        let evt;
+        try { evt = JSON.parse(line.slice(6)); } catch { continue; }
+
+        if (evt.type === 'text') {
+          rawText += evt.text;
+          streamPre.textContent = rawText;
+          document.getElementById('scriptPanel').scrollTo({ top: 999999, behavior: 'smooth' });
+          // Advance loading bar proportionally (tokens ≈ 1800 max).
+          const pct = Math.min(90, 40 + Math.round((rawText.length / 5000) * 50));
+          setLoadingBar(pct);
+        } else if (evt.type === 'error') {
+          throw new Error(evt.message);
+        }
+      }
+    }
+
+    // Replace raw preview with formatted script.
+    streamPre.remove();
+    cursorEl.remove();
+    generatedContent += '\n' + rawText;
+    sceneCount++;
+
+    renderScript(rawText, sceneType);
+    setLoadingBar(100);
+    setTimeout(() => setLoadingBar(0), 600);
+
+    document.getElementById('exportBar').classList.add('visible');
+    document.getElementById('scenesPanel').classList.add('visible');
+    document.getElementById('exportTitle').textContent = title;
+    markBeatDone(sceneType === 'opening' ? 'opening' : sceneType === 'inciting' ? 'inciting' : sceneType === 'interval' ? 'interval' : sceneType === 'climax' ? 'climax' : 'resolution');
+
+  } catch(e) {
+    streamPre.remove();
+    cursorEl.remove();
+    document.getElementById('streamTarget').insertAdjacentHTML('beforeend',
+      `<div style="color:#c0392b;font-size:13px;padding:20px 0">Error: ${e.message}</div>`);
+    setLoadingBar(0);
+  }
+
+  document.getElementById('genBtn').disabled = false;
+  document.getElementById('genBtn').innerHTML = 'Script Generate Karo';
+}
+
+function renderScript(raw, beatType) {
+  const target = document.getElementById('streamTarget');
+  const lines = raw.split('\n');
+  let html = '';
+  let sceneNavItems = [];
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    // Beat label (hidden structurally)
+    if (line.startsWith('|BEAT:')) { i++; continue; }
+
+    // Interval marker — only match the explicit tag or a standalone INTERVAL line
+    if (line === '|INTERVAL|' || /^[-—\s]*INTERVAL[-—\s]*$/i.test(line)) {
+      html += `<div class="interval-marker fade-in">
+        <div class="interval-text">— INTERVAL —</div>
+        <div class="interval-note">Audience break · Story resumes in second half</div>
+      </div>`;
+      sceneNavItems.push({label: '— INTERVAL —', isInterval: true});
+      i++; continue;
+    }
+
+    // Song note
+    if (line.startsWith('|SONG|') || line.toUpperCase().startsWith('[SONG SEQUENCE')) {
+      const songDesc = line.replace('|SONG|','').replace(/\[SONG SEQUENCE[:\s]*/i,'').replace(']','').trim();
+      html += `<div class="song-note fade-in">
+        <div class="song-label">Song Sequence</div>
+        <div class="song-desc">${songDesc || 'Emotional musical interlude'}</div>
+      </div>`;
+      i++; continue;
+    }
+
+    // Scene heading: INT./EXT. or |SCENE|
+    if (line.startsWith('|SCENE|') || /^(INT\.|EXT\.|INT\/EXT)/.test(line)) {
+      const heading = line.replace('|SCENE|','').trim();
+      html += `<div class="scene-heading fade-in">${heading}</div>`;
+      sceneNavItems.push({label: heading, isInterval: false});
+      i++; continue;
+    }
+
+    // Check for character name followed by dialogue.
+    // Character name = ALL CAPS, 2-40 chars, not a scene direction keyword.
+    const DIRECTION_WORD = /^(INT|EXT|INT\.\/EXT|FADE|CUT|DISSOLVE|SMASH|DAY|NIGHT|MORNING|EVENING|DAWN|DUSK|CONTINUOUS|LATER|MOMENTS|FLASHBACK|TITLE|THE END)(\s|$|\.)/;
+    const isCharName = /^[A-Z][A-Z\s\(\)'\.]{1,39}$/.test(line)
+      && line.length >= 2
+      && !DIRECTION_WORD.test(line);
+    if (isCharName && i + 1 < lines.length) {
+      const charName = line;
+      i++;
+      let paren = '';
+      let dialogueLines = [];
+
+      // Parenthetical
+      if (lines[i] && lines[i].trim().startsWith('(')) {
+        paren = lines[i].trim();
+        i++;
+      }
+
+      // Dialogue lines (until blank line or next character)
+      while (i < lines.length && lines[i].trim() !== '' && !/^[A-Z][A-Z\s\(\)'\.]+$/.test(lines[i].trim())) {
+        dialogueLines.push(lines[i].trim());
+        i++;
+      }
+
+      html += `<div class="dialogue-block fade-in">
+        <div class="character-name">${charName}</div>
+        ${paren ? `<div class="parenthetical">${paren}</div>` : ''}
+        <div class="dialogue-text">${dialogueLines.join(' ')}</div>
+      </div>`;
+      continue;
+    }
+
+    // Action line
+    if (line.length > 2 && !line.startsWith('#') && !line.startsWith('---')) {
+      html += `<div class="action-line fade-in">${line}</div>`;
+    }
+
+    i++;
+  }
+
+  target.insertAdjacentHTML('beforeend', html);
+
+  // Update scene nav
+  const navList = document.getElementById('sceneNavList');
+  sceneNavItems.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'scene-nav-item' + (item.isInterval ? ' is-interval' : '');
+    el.textContent = item.label.replace(/^(INT\.|EXT\.)\s*/,'').substring(0, 28);
+    navList.appendChild(el);
+  });
+
+  // Scroll to bottom
+  document.getElementById('scriptPanel').scrollTo({top: 999999, behavior: 'smooth'});
+}
+
+async function generateMore() {
+  const sceneTypeEl = document.getElementById('sceneType');
+  const currentIndex = sceneTypeEl.selectedIndex;
+  if (currentIndex < sceneTypeEl.options.length - 1) {
+    sceneTypeEl.selectedIndex = currentIndex + 1;
+  }
+  await generateScript(true); // continueMode — append, don't reset
+}
+
+async function rewriteDialogue() {
+  alert('Dialogue rewriter: Select any dialogue block in the script to rewrite it in a different register or tone. (Full feature in production build)');
+}
+
+function exportPDF() {
+  const title = currentTitle || 'Script';
+  const printContent = document.getElementById('scriptPage').innerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <title>${title}</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono&display=swap" rel="stylesheet">
+    <style>
+      body{font-family:'DM Mono',monospace;font-size:12px;line-height:1.75;color:#1a1612;background:white;padding:40px 60px;max-width:700px;margin:0 auto}
+      .script-title{font-family:'EB Garamond',serif;font-size:24px;font-weight:600;text-align:center;text-transform:uppercase;margin-bottom:4px}
+      .script-subtitle,.script-meta{text-align:center;color:#7a6f5e;font-size:11px}
+      .script-title-block{padding-bottom:24px;border-bottom:1px solid #ccc;margin-bottom:32px}
+      .scene-heading{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:#f0ebe0;border-left:3px solid #c0392b;padding:5px 8px;margin:24px 0 8px}
+      .action-line{margin-bottom:8px}
+      .dialogue-block{margin:12px 0 12px 60px;max-width:360px}
+      .character-name{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;text-align:center}
+      .parenthetical{font-style:italic;color:#7a6f5e;text-align:center;font-size:11px}
+      .dialogue-text{font-family:'EB Garamond',serif;font-size:14px;line-height:1.7}
+      .interval-marker{text-align:center;border-top:1.5px solid #c0392b;border-bottom:1.5px solid #c0392b;padding:12px;margin:32px 0}
+      .interval-text{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#c0392b}
+      .song-note{background:#faf5e4;border:0.5px solid #d4a017;padding:10px 14px;border-radius:4px;margin:16px 0}
+      .song-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b8860b;margin-bottom:3px}
+      .song-desc{font-style:italic;font-family:'EB Garamond',serif;font-size:13px}
+      @media print{body{padding:20px 40px}}
+    </style>
+  </head><body>${printContent}</body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 800);
+}
+</script>
+</body>
+</html>

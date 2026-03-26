@@ -1,0 +1,15 @@
+{
+  "name": "likhavat",
+  "version": "1.0.0",
+  "description": "Hindi Film Script Writer — Likhavat",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"server,frontend\" --prefix-colors \"red,blue\" \"node server/index.js\" \"npx serve frontend -p 3000 --no-clipboard\"",
+    "server": "node server/index.js",
+    "frontend": "npx serve frontend -p 3000 --no-clipboard",
+    "setup": "npm install && npm --prefix server install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
