@@ -2,7 +2,19 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(npm --prefix server install)"
+      "Bash(npm --prefix server install)",
+      "Bash(mkdir -p /c/Users/ashus/OneDrive/Documents/Code/DynamoUI/backend/skill_registry/models)",
+      "Bash(mkdir -p /c/Users/ashus/OneDrive/Documents/Code/DynamoUI/backend/skill_registry/loader)",
+      "Bash(mkdir -p /c/Users/ashus/OneDrive/Documents/Code/DynamoUI/backend/skill_registry/scaffold)",
+      "Bash(mkdir -p /c/Users/ashus/OneDrive/Documents/Code/DynamoUI/backend/skill_registry/cli)",
+      "Bash(mkdir -p /c/Users/ashus/OneDrive/Documents/Code/DynamoUI/backend/skill_registry/api)",
+      "Bash(BASE=\"c:/Users/ashus/OneDrive/Documents/Code/DynamoUI\")",
+      "Bash(for d:*)",
+      "Bash(do)",
+      "Bash(mkdir -p \"$BASE/$d\")",
+      "Bash(touch \"$BASE/$d/__init__.py\")",
+      "Bash(python -m py_compile backend/skill_registry/models/skill.py backend/skill_registry/models/enum.py backend/skill_registry/models/pattern.py backend/skill_registry/models/mutation.py backend/skill_registry/models/registry.py backend/skill_registry/config/settings.py backend/skill_registry/loader/yaml_loader.py backend/skill_registry/loader/validator.py backend/skill_registry/registry/enum_registry.py backend/skill_registry/formatters/llm_formatter.py backend/skill_registry/formatters/ui_formatter.py backend/skill_registry/scaffold/scaffolder.py backend/skill_registry/cli/validate.py backend/skill_registry/api/rest_router.py backend/skill_registry/api/widgets_router.py backend/pattern_cache/models/pattern.py backend/pattern_cache/versioning/hasher.py backend/pattern_cache/loader/pattern_loader.py backend/pattern_cache/index/trigger_index.py backend/pattern_cache/index/fuzzy_matcher.py backend/pattern_cache/cache/pattern_cache.py backend/pattern_cache/promotion/promoter.py backend/pattern_cache/api/rest_router.py backend/adapters/base.py backend/adapters/registry.py backend/adapters/postgresql/type_map.py backend/adapters/postgresql/engine.py backend/adapters/postgresql/table_builder.py backend/adapters/postgresql/query_translator.py backend/adapters/postgresql/diff_builder.py backend/adapters/postgresql/mutation_executor.py backend/adapters/postgresql/schema_inspector.py backend/adapters/postgresql/schema_validator.py backend/adapters/postgresql/adapter.py backend/adapters/api/rest_router.py backend/main.py)",
+      "Bash(python -m py_compile tests/conftest.py tests/test_models.py tests/test_loader.py tests/test_validator.py tests/test_pattern_cache.py tests/test_formatters.py tests/test_adapters.py tests/test_api.py tests/test_cli.py tests/test_scaffolder.py tests/test_settings.py)"
     ]
   }
 }
